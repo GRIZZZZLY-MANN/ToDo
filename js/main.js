@@ -3,17 +3,60 @@ const form =  document.querySelector('#form')
 const inputElement = document.querySelector('#taskInput')
 const submitBtn = document.querySelector('#submit')
 const emptyList = document.querySelector('#emptyList')
+const waterCounter = document.querySelector('#waterCounter')
 
 let tasks = []
+
+let waterDrops = [
+]
 
 if(localStorage.getItem('tasks')){
 	tasks = JSON.parse(localStorage.getItem('tasks'))
 }
-
 tasks.forEach(element => {
 	renderTask(element)
 });
+function renderTask(task){
+	tasksList.insertAdjacentHTML("beforeend", templateTask(task.text, task.id, task.done))
+}
+
 checkEmptyList()
+
+if(localStorage.getItem('water')){
+	waterDrops = JSON.parse(localStorage.getItem('water'))
+}
+else{
+	for(i=1; i<=4; i++)
+	{
+		createWater(i)
+	}
+}
+waterDrops.forEach(element => {
+		renderWater(element)
+})
+function renderWater(drop){
+	waterCounter.insertAdjacentHTML("beforeend", templateWater(drop.id, drop.done))
+}
+function createWater(id){
+	const newdrop = {
+		id: id,
+		done: false
+	}
+	waterDrops.push(newdrop)
+	localStorage.setItem('water',JSON.stringify(waterDrops))
+}
+
+function waterCounterAction(event){
+		const neededDrop = event.target
+		const id = Number(neededDrop.id)
+		neededDrop.classList.toggle('done')
+		const neededEl = waterDrops.find(element => element.id === id)
+		neededEl.done = !neededEl.done
+		localStorage.setItem('water',JSON.stringify(waterDrops))
+		
+}
+waterCounter.addEventListener('click', waterCounterAction)
+
 
 function taskAction(event){
 	if(event.target.dataset.action === 'delete'){
@@ -44,6 +87,45 @@ function taskAction(event){
 }
 
 tasksList.addEventListener('click', taskAction)
+
+function taskAdd(event) {
+	event.preventDefault()
+
+	const text = inputElement.value
+
+	const newTask = {
+		id: Date.now(),
+		text: text,
+		done: false
+	}
+
+	tasks.push(newTask)
+	saveToLocalStorage()
+
+
+	renderTask(newTask)
+	inputElement.value = ''
+	inputElement.focus()
+	checkEmptyList()
+	// if(tasksList.children.length > 1){
+	// 	emptyList.classList.add('none')
+	// }
+	
+}
+form.addEventListener('submit', taskAdd)
+
+function checkEmptyList(){
+	if(tasks.length === 0){
+		tasksList.insertAdjacentHTML('afterbegin', templateEmpty())
+	}
+	else{
+		const emptyList = document.querySelector('#emptyList')
+		emptyList ? emptyList.remove() : null
+	}
+}
+function saveToLocalStorage(){
+	localStorage.setItem('tasks',JSON.stringify(tasks))
+}
 
 function templateTask (text, id, done) {
 	if(done === false){
@@ -84,44 +166,13 @@ function templateEmpty () {
 					<div class="empty-list__title">Список дел пуст</div>
 				</li>`
 }
-function taskAdd(event) {
-	event.preventDefault()
-
-	const text = inputElement.value
-
-	const newTask = {
-		id: Date.now(),
-		text: text,
-		done: false
-	}
-
-	tasks.push(newTask)
-	saveToLocalStorage()
-
-
-	renderTask(newTask)
-	inputElement.value = ''
-	inputElement.focus()
-	checkEmptyList()
-	// if(tasksList.children.length > 1){
-	// 	emptyList.classList.add('none')
-	// }
-	
-}
-form.addEventListener('submit', taskAdd)
-
-function checkEmptyList(){
-	if(tasks.length === 0){
-		tasksList.insertAdjacentHTML('afterbegin', templateEmpty())
-	}
-	else{
-		const emptyList = document.querySelector('#emptyList')
-		emptyList ? emptyList.remove() : null
-	}
-}
-function saveToLocalStorage(){
-	localStorage.setItem('tasks',JSON.stringify(tasks))
-}
-function renderTask(task){
-	tasksList.insertAdjacentHTML("beforeend", templateTask(task.text, task.id, task.done))
+function templateWater(id, done) {
+ if (done === false){
+	return `
+            <img class="water-action" id="${id}" src="./img/drop.svg" alt="Empty" width="48" class="mt-3">`
+ }
+ else{
+	return `
+            <img class="water-action done" id="${id}" src="./img/drop.svg" alt="Empty" width="48" class="mt-3">`
+ }
 }

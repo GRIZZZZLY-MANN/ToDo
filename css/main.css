@@ -23,7 +23,7 @@ body {
   padding-top: 5px;
 }
 .gray {
-  color: #BDBDBD;
+  background-color: #BDBDBD;
 }
 .task-title--done {
   text-decoration: line-through;
@@ -76,9 +76,26 @@ body {
 .btn-action img {
   pointer-events: none;
 }
+.water-action{
+  background-color: #e0e5ea;
+  cursor: pointer;
+  border: 0;
+  border-radius: 4px;
+  transition: opacity 0.2s ease-in;
+  
+  opacity: 1;
+  list-style: none;
+}
+.water-action:hover{
+  background-color: #e0e5ea;
+  opacity: 0.5;
+}
 
 .none {
   display: none !important;
+}
+.done {
+  opacity: 0.5;
 }
 
 .float-right {
